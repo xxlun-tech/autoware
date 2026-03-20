@@ -41,6 +41,10 @@ repositories:
     type: git
     url: https://github.com/tier4/tier4_autoware_msgs.git
     version: v0.58.0
+  universe/external/muSSP:
+    type: git
+    url: https://github.com/tier4/muSSP.git
+    version: c79e98fd5e658f4f90c06d93472faa977bc873b9
   universe/external/pointcloud_to_laserscan:
     type: git
     url: https://github.com/tier4/pointcloud_to_laserscan.git
