@@ -37,16 +37,11 @@ repositories:
     type: git
     url: https://github.com/osrf/negotiated.git
     version: eac198b55dcd052af5988f0f174902913c5f20e7
-  # launcher
   # sensor_component
   sensor_component/external/sensor_component_description:
     type: git
     url: https://github.com/tier4/sensor_component_description.git
     version: 03ba094851ec90febfcfc0adb20b64b0e19df7a8
-  sensor_component/external/nebula:
-    type: git
-    url: https://github.com/tier4/nebula.git
-    version: v0.4.0
   sensor_component/external/sync_tooling_msgs:
     type: git
     url: https://github.com/tier4/sync_tooling_msgs.git
