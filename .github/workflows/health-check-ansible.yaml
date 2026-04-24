@@ -1,0 +1,92 @@
+name: health-check-ansible
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - labeled
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  changed-files:
+    runs-on: ubuntu-latest
+    outputs:
+      should-run: ${{ steps.check.outputs.any_changed }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - id: check
+        uses: step-security/changed-files@v47
+        with:
+          files: |
+            ansible/**
+            ansible-galaxy-requirements.yaml
+            .github/workflows/health-check-ansible.yaml
+
+  require-label:
+    needs: changed-files
+    if: needs.changed-files.outputs.should-run == 'true'
+    uses: autowarefoundation/autoware-github-actions/.github/workflows/require-label.yaml@v1
+    with:
+      label: run:health-check
+
+  install-dev-env:
+    needs: require-label
+    if: ${{ needs.require-label.outputs.result == 'true' }}
+    runs-on: [self-hosted, Linux, X64]
+    strategy:
+      fail-fast: false
+      matrix:
+        image:
+          - ubuntu:22.04
+          - ubuntu:24.04
+    container:
+      image: ${{ matrix.image }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Show disk space
+        if: always()
+        run: |
+          df -h
+
+      - name: Configure apt retries and mirror fallback
+        run: |
+          echo 'Acquire::Retries "5";' > /etc/apt/apt.conf.d/99-retries
+          echo 'Acquire::http::Timeout "30";' >> /etc/apt/apt.conf.d/99-retries
+          echo 'Acquire::https::Timeout "30";' >> /etc/apt/apt.conf.d/99-retries
+          printf 'http://azure.archive.ubuntu.com/ubuntu\tpriority:1\nhttp://archive.ubuntu.com/ubuntu\tpriority:2\n' > /etc/apt/ubuntu-mirrors.list
+          for f in /etc/apt/sources.list /etc/apt/sources.list.d/ubuntu.sources; do
+            if [ -f "$f" ]; then
+              sed -E -i 's|http://archive\.ubuntu\.com/ubuntu/?|mirror+file:///etc/apt/ubuntu-mirrors.list|g' "$f"
+            fi
+          done
+
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install -y git sudo curl ca-certificates apt-utils
+
+      - name: Install tzdata non-interactively
+        run: |
+          DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata
+
+      - name: Set git config
+        uses: autowarefoundation/autoware-github-actions/set-git-config@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install dev environment via ansible
+        run: |
+          bash ansible/scripts/install-ansible.sh
+          export PATH="$HOME/.local/bin:$PATH"
+          ansible-galaxy collection install -f -r ansible-galaxy-requirements.yaml
+          ansible-playbook autoware.dev_env.install_dev_env -v

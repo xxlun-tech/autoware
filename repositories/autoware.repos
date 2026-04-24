@@ -12,6 +12,11 @@ repositories:
     type: git
     url: https://github.com/autowarefoundation/autoware_lanelet2_extension.git
     version: 0.12.0
+  # Temporary pin, see https://github.com/autowarefoundation/autoware_core/issues/1031
+  core/external/rviz_2d_overlay_plugins:
+    type: git
+    url: https://github.com/teamspatzenhirn/rviz_2d_overlay_plugins.git
+    version: 1.4.0
   # universe
   universe/external/muSSP:
     type: git
