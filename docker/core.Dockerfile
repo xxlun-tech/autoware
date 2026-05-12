@@ -17,7 +17,7 @@ RUN --mount=type=bind,source=ansible-galaxy-requirements.yaml,target=/tmp/ansibl
     pipx install --include-deps "ansible==10.*" && \
     cd /tmp/ansible && \
     ansible-galaxy collection install -f -r ansible-galaxy-requirements.yaml && \
-    ansible-playbook autoware.dev_env.autoware_requirements \
+    ansible-playbook autoware.dev_env.install_image_deps \
       --tags core \
       --skip-tags base \
       -e "rosdistro=${ROS_DISTRO}" && \
@@ -89,6 +89,16 @@ RUN --mount=type=bind,source=src/core/autoware_core,target=/tmp/autoware/src/cor
       --cmake-args -DCMAKE_BUILD_TYPE=Release && \
     rm -rf build log
 
+RUN --mount=type=cache,id=apt-cache-${ROS_DISTRO},target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,id=apt-lists-${ROS_DISTRO},target=/var/lib/apt/lists,sharing=locked \
+    apt-get update && \
+    . "/opt/ros/${ROS_DISTRO}/setup.sh" && \
+    . /opt/autoware/setup.sh && \
+    rosdep install -y --from-paths /tmp/autoware/src/core \
+      --ignore-src \
+      --rosdistro "${ROS_DISTRO}" \
+      --dependency-types=exec
+
 FROM ${BASE_IMAGE} AS core
 ARG ROS_DISTRO
 ENV AUTOWARE_RUNTIME=1
@@ -105,7 +115,7 @@ RUN --mount=type=bind,source=ansible-galaxy-requirements.yaml,target=/tmp/ansibl
     pipx install --include-deps "ansible==10.*" && \
     cd /tmp/ansible && \
     ansible-galaxy collection install -f -r ansible-galaxy-requirements.yaml && \
-    ansible-playbook autoware.dev_env.autoware_requirements \
+    ansible-playbook autoware.dev_env.install_image_deps \
       --tags geographiclib,qt5ct_setup \
       -e "rosdistro=${ROS_DISTRO}" && \
     pipx uninstall ansible

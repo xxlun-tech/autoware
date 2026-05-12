@@ -1,9 +1,17 @@
 repositories:
   # core
+  # TODO(TIER IV): During the transition period of Agnocast introduction,
+  # the Agnocast ROS packages are provided as a source build.
+  # Once the transition stabilizes, use the packages released from the official ROS repository.
+  # Issue: https://github.com/autowarefoundation/autoware/issues/5968
+  core/agnocast:
+    type: git
+    url: https://github.com/autowarefoundation/agnocast.git
+    version: 2.3.3
   core/autoware_msgs:
     type: git
     url: https://github.com/autowarefoundation/autoware_msgs.git
-    version: 1.11.0
+    version: 1.12.0
   core/autoware_cmake:
     type: git
     url: https://github.com/autowarefoundation/autoware_cmake.git
@@ -11,12 +19,13 @@ repositories:
   core/autoware_lanelet2_extension:
     type: git
     url: https://github.com/autowarefoundation/autoware_lanelet2_extension.git
-    version: 0.12.0
+    version: 1.1.0
   # Temporary pin, see https://github.com/autowarefoundation/autoware_core/issues/1031
   core/external/rviz_2d_overlay_plugins:
     type: git
     url: https://github.com/teamspatzenhirn/rviz_2d_overlay_plugins.git
     version: 1.4.0
+
   # universe
   universe/external/muSSP:
     type: git
@@ -61,12 +70,3 @@ repositories:
     type: git
     url: https://github.com/autowarefoundation/ros2_socketcan
     version: e39a814180b03f00a5692b6951a5d4e9f0463486
-  # middleware
-  # TODO(TIER IV): During the transition period of Agnocast introduction,
-  # the Agnocast ROS packages are provided as a source build.
-  # Once the transition stabilizes, use the packages released from the official ROS repository.
-  # Issue: https://github.com/autowarefoundation/autoware/issues/5968
-  middleware/external/agnocast:
-    type: git
-    url: https://github.com/tier4/agnocast.git
-    version: 2.3.3
