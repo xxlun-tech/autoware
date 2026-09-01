@@ -7,7 +7,7 @@ repositories:
   core/agnocast:
     type: git
     url: https://github.com/autowarefoundation/agnocast.git
-    version: 2.3.4
+    version: 2.3.5
   core/autoware_msgs:
     type: git
     url: https://github.com/autowarefoundation/autoware_msgs.git
@@ -15,11 +15,11 @@ repositories:
   core/autoware_cmake:
     type: git
     url: https://github.com/autowarefoundation/autoware_cmake.git
-    version: 1.2.0
+    version: 1.4.0
   core/autoware_lanelet2_extension:
     type: git
     url: https://github.com/autowarefoundation/autoware_lanelet2_extension.git
-    version: 1.1.0
+    version: 1.2.0
   # Temporary pin, see https://github.com/autowarefoundation/autoware_core/issues/1031
   core/external/rviz_2d_overlay_plugins:
     type: git
@@ -39,14 +39,10 @@ repositories:
     type: git
     url: https://github.com/autowarefoundation/bevdet_vendor.git
     version: 0.1.0
-  universe/external/trt_batched_nms:
-    type: git
-    url: https://github.com/autowarefoundation/trt_batched_nms.git
-    version: 0.1.0
   universe/external/cuda_blackboard:
     type: git
     url: https://github.com/autowarefoundation/cuda_blackboard.git
-    version: 0.3.0
+    version: 0.4.0
   universe/external/negotiated:
     type: git
     url: https://github.com/osrf/negotiated.git
@@ -59,7 +55,7 @@ repositories:
   sensor_component/external/sync_tooling_msgs:
     type: git
     url: https://github.com/tier4/sync_tooling_msgs.git
-    version: 0.2.9
+    version: v0.2.10
   # Fork of transport_drivers that enables reduction of copy operations
   sensor_component/transport_drivers:
     type: git

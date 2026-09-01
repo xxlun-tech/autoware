@@ -101,6 +101,29 @@ docker buildx bake -f docker/docker-bake.hcl universe-cuda
 ROS_DISTRO=humble docker buildx bake -f docker/docker-bake.hcl base
 ```
 
+## Reproducible builds (`USE_LOCKFILE`)
+
+By default a target builds against the floating `ros:<distro>-ros-base` tag and the latest packages from `packages.ros.org` and the Ubuntu archive, so the same target built on different days can differ. Set `USE_LOCKFILE=true` to make the build reproducible:
+
+```bash
+# Reproducible base image for the default distro (jazzy)
+USE_LOCKFILE=true docker buildx bake -f docker/docker-bake.hcl base
+
+# Reproducible build for humble
+USE_LOCKFILE=true ROS_DISTRO=humble docker buildx bake -f docker/docker-bake.hcl base
+```
+
+When enabled, the build:
+
+- pins the base image to the per-distro digest in `BASE_IMAGE_DIGESTS` (`docker/docker-bake.hcl`) instead of the floating `ros:<distro>-ros-base` tag, freezing the OS-level closure;
+- passes `use_locked_versions=true` to ansible, which pins Ubuntu-archive packages to the versions in `ansible/vars/locked-versions-<distro>-<arch>.yaml` and points ROS at the dated `snapshots.ros.org` source recorded in that lockfile, freezing every ROS dependency that snapshot serves;
+- walks any package the base image preinstalled at a different version than the snapshot back to the snapshot's version (the floating `ros:<distro>-ros-base` tag is usually newer than the lockfile's `ros_snapshot_date`), so every snapshot-served package in the final image is at its snapshot version; and
+- verifies after install that every locked package landed at its pinned version, failing the build on any drift.
+
+Only distros that have **both** a lockfile and a `BASE_IMAGE_DIGESTS` entry can be built in locked mode (currently `humble` and `jazzy`); requesting `USE_LOCKFILE=true` for any other `ROS_DISTRO` fails the build rather than silently falling back to a floating base. The CUDA targets (`base-cuda-*`, `universe-cuda`) also build in locked mode: they inherit the frozen apt pins and dated snapshot from the `base` image they build on, and the CUDA / cuDNN / TensorRT closure from NVIDIA's apt repositories is frozen by the lockfile's `nvidia_pins` section. NVIDIA publishes no dated snapshot, so that closure is pinned by exact version per package (see the version_lock README for how `nvidia_pins` is recorded).
+
+Locked mode is not a hermetic build. The rolling `packages.ros.org` source stays configured, so a `ros-*` package the dated snapshot does not carry — Autoware's own released packages among them — still installs from rolling and floats. See "What the freeze does not cover" in [`ansible/roles/version_lock/README.md`](../ansible/roles/version_lock/README.md), which also documents the lockfile format and how to generate or update lockfiles.
+
 ## Usage
 
 ```bash
