@@ -9,7 +9,7 @@ repositories:
     version: main
   core/autoware_core:
     type: git
-    url: https://github.com/autowarefoundation/autoware_core.git
+    url: https://github.com/xxlun-tech/aw_core.git
     version: main
   core/autoware_utils: # TODO(mitsudome-r): Remove this repository entry when https://github.com/autowarefoundation/autoware/pull/5700 is merged.
     type: git
@@ -29,7 +29,7 @@ repositories:
     version: main
   universe/autoware_universe:
     type: git
-    url: https://github.com/autowarefoundation/autoware_universe.git
+    url: https://github.com/xxlun-tech/aw_universe.git
     version: main
   universe/external/managed_transform_buffer:
     type: git
